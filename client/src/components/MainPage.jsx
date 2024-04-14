@@ -8,7 +8,7 @@ function MainPage() {
   const navigate = useNavigate();
 
   const [addTask, setAddTask] = useState({ taskName: "", taskDescription: "" });
-  const[allTasks,setAllTasks]= useState([]);
+  const [allTasks, setAllTasks] = useState([]);
 
   const [editingTask, setEditingTask] = useState({
     taskId: null,
@@ -35,116 +35,123 @@ function MainPage() {
     const { name, value } = event.target;
     setEditingTask({ ...editingTask, [name]: value });
   };
-  
 
   const saveEditedTask = async (task) => {
     try {
-      const value = localStorage.getItem('token');
-      console.log('Token:', value);
-      let authResponse = await axios.get('/api/auth/verify', {
+      const value = localStorage.getItem("token");
+      console.log("Token:", value);
+      let authResponse = await axios.get("/api/auth/verify", {
         headers: {
-          token: value
+          token: value,
         },
-        responseType: 'json'
+        responseType: "json",
       });
 
       console.log(authResponse.data);
-  
+
       let userPayload = authResponse.data.email;
-  
+
       if (authResponse.status === 401) {
         navigate("/login");
       }
-  
-      const response = await axios.put(`/api/user/editTask`, {
-        taskName: editingTask.editedTaskName,
-        taskDescription: editingTask.editedTaskDescription,
-      }, {
-        params :{
-          email: userPayload,
-          taskId: task.taskId,
+
+      const response = await axios.put(
+        `/api/user/editTask`,
+        {
+          taskName: editingTask.editedTaskName,
+          taskDescription: editingTask.editedTaskDescription,
+        },
+        {
+          params: {
+            email: userPayload,
+            taskId: task.taskId,
+          },
         }
-      });
-      
+      );
+
       if (response.status === 200) {
         window.alert("Task Details Updated Successfully!");
         fetchTasks();
       } else {
         window.alert("Failed to update task");
       }
-      setEditingTask({ taskId: null, editedTaskName: "", editedTaskDescription: "" });
+      setEditingTask({
+        taskId: null,
+        editedTaskName: "",
+        editedTaskDescription: "",
+      });
     } catch (error) {
       console.error(error);
       window.alert("Something went wrong!");
     }
   };
 
-  const fetchTasks = async ()=>{
+  const fetchTasks = async () => {
     try {
-
-      const value = localStorage.getItem('token');
-      let authResponse = await axios.get('/api/auth/verify', {
+      const value = localStorage.getItem("token");
+      let authResponse = await axios.get("/api/auth/verify", {
         headers: {
-          token: value
-        }
+          token: value,
+        },
       });
-      
-console.log(authResponse.data);
-let userPayload = authResponse.data.email
-    
-    if (authResponse.status === 401) {
-     navigate("/login")
-    }
-  
-    const response = await axios.get('/api/user/allTasks',{
-      params:{
-        email:userPayload
-      }
-    });
 
-      if(response.status ===200){
-        setAllTasks(response.data.allTasks);
-      }else{
-        window.alert("Failed to Fetch All Tasks")
+      console.log(authResponse.data);
+      let userPayload = authResponse.data.email;
+
+      if (authResponse.status === 401) {
+        navigate("/login");
       }
-      
+
+      const response = await axios.get("/api/user/allTasks", {
+        params: {
+          email: userPayload,
+        },
+      });
+
+      if (response.status === 200) {
+        setAllTasks(response.data.allTasks);
+      } else {
+        window.alert("Failed to Fetch All Tasks");
+      }
     } catch (error) {
       console.error(error);
       window.alert("Something went wrong!");
     }
-  }
+  };
 
   useEffect(() => {
     fetchTasks();
   }, []);
 
-
   const postData = async () => {
     try {
       const { taskName, taskDescription } = addTask;
 
-      const value = localStorage.getItem('token');
-      let authResponse = await axios.get('/api/auth/verify', {
+      const value = localStorage.getItem("token");
+      let authResponse = await axios.get("/api/auth/verify", {
         headers: {
-          token: value
-        }
+          token: value,
+        },
       });
-      
-console.log(authResponse.data);
-let userPayload = authResponse.data.email
-    
-    if (authResponse.status === 401) {
-     navigate("/login")
-    }
 
+      console.log(authResponse.data);
+      let userPayload = authResponse.data.email;
 
-      const response = await axios.post("/api/user/addTask", {
-        ...addTask,
-      },{
-        params:{
-          email:userPayload
+      if (authResponse.status === 401) {
+        navigate("/login");
+      }
+
+      const response = await axios.post(
+        "/api/user/addTask",
+        {
+          ...addTask,
+        },
+        {
+          params: {
+            email: userPayload,
+          },
         }
-      });
+      );
 
       if (response.status === 200) {
         const { token } = response.data;
@@ -164,26 +171,26 @@ let userPayload = authResponse.data.email
     }
   };
 
-  const deleteTask = async (taskIdtoDelete) => { 
+  const deleteTask = async (taskIdtoDelete) => {
     try {
-       const value = localStorage.getItem('token');
-       let authResponse = await axios.get('/api/auth/verify', {
-         headers: {
-           token: value
-         }
-       });
-       
-       console.log(authResponse.data);
-       let userPayload = authResponse.data.email
-     
-       if (authResponse.status === 401) {
-        navigate("/login")
-       }
+      const value = localStorage.getItem("token");
+      let authResponse = await axios.get("/api/auth/verify", {
+        headers: {
+          token: value,
+        },
+      });
+
+      console.log(authResponse.data);
+      let userPayload = authResponse.data.email;
+
+      if (authResponse.status === 401) {
+        navigate("/login");
+      }
       console.log("hi comming from frontend delete ");
       const response = await axios.delete(`/api/user/delete`, {
         params: {
           email: userPayload,
-          taskId : taskIdtoDelete
+          taskId: taskIdtoDelete,
         },
       });
 
@@ -199,7 +206,6 @@ let userPayload = authResponse.data.email
     }
   };
 
-  
   const handleSubmit = async (event) => {
     event.preventDefault();
     await postData();
@@ -207,66 +213,65 @@ let userPayload = authResponse.data.email
 
   return (
     <>
-     <Navbar />
+      <Navbar />
       <br />
-      <div className="w-full px-4 py-12 sm:px-6 sm:py-16 lg:w-1/2 lg:px-8 lg:py-24 mx-auto">
+      <div className="w-full px-4 py-12 sm:px-6 sm:py-16 lg:w-1/2 lg:px-8 lg:py-24 mx-auto ">
         <div className="mx-auto max-w-lg text-center">
           <h1 className="text-2xl font-bold sm:text-3xl">Add Task</h1>
         </div>
 
         <form
-            method="POST"
-            className="mx-auto mb-0 mt-8 max-w-md space-y-4"
-            onSubmit={handleSubmit}
-          >
+          method="POST"
+          className="mx-auto mb-0 mt-8 max-w-md space-y-4"
+          onSubmit={handleSubmit}
+        >
+          <div>
+            <label htmlFor="taskName" className="sr-only">
+              Task Name
+            </label>
 
-            <div>
-              <label htmlFor="taskName" className="sr-only">
-                Task Name
-              </label>
-
-              <div className="relative">
-                <input
-                  type="text"
-                  className="w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-sm"
-                  placeholder="Enter Task Name"
-                  name="taskName"
-                  id="taskName"
-                  autoComplete="off"
-                  value={addTask.taskName}
-                  onChange={handleInput}
-                />
-              </div>
+            <div className="relative">
+              <input
+                type="text"
+                className="w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-sm"
+                placeholder="Enter Task Name"
+                name="taskName"
+                id="taskName"
+                autoComplete="off"
+                value={addTask.taskName}
+                onChange={handleInput}
+              />
             </div>
-            <div>
-              <label htmlFor="password" className="sr-only">
-                Password
-              </label>
+          </div>
+          <div>
+            <label htmlFor="password" className="sr-only">
+              Password
+            </label>
 
-              <div className="relative">
-                <input
-                  type="text"
-                  className="w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-sm"
-                  placeholder="Enter Task Description"
-                  name="taskDescription"
-                  id="taskDescription"
-                  autoComplete="off"
-                  value={addTask.taskDescription}
-                  onChange={handleInput}
-                />
-              </div>
+            <div className="relative">
+              <input
+                type="text"
+                className="w-full rounded-lg border-gray-200 p-4 pe-12 text-sm shadow-sm"
+                placeholder="Enter Task Description"
+                name="taskDescription"
+                id="taskDescription"
+                autoComplete="off"
+                value={addTask.taskDescription}
+                onChange={handleInput}
+              />
             </div>
+          </div>
 
-            <div className="flex items-center justify-between">
-              <br />
-              <button
-                type="submit"
-                className="inline-block  rounded-lg bg-blue-500 px-5 py-3 text-sm font-medium text-white mx-auto"
-              >
+          <div className="flex items-center justify-between">
+            <br />
+            <button
+              type="submit"
+              className="inline-block  rounded-lg bg-blue-500 px-5 py-3 text-sm font-medium text-white mx-auto"
+            >
               Add Task
-              </button>
-            </div>
-          </form>
+            </button>
+          </div>
+        </form>
       </div>
 
       <section className="bg-black-100 p-4">
@@ -321,7 +326,8 @@ let userPayload = authResponse.data.email
                     >
                       Edit
                     </button>
-                  )} <br /> 
+                  )}{" "}
+                  <br />
                   <button
                     className="text-red-600 cursor-pointer"
                     onClick={() => deleteTask(task.taskId)}
